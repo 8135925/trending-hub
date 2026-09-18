@@ -1,4 +1,9 @@
-import { type Language, type RangeValue, TIME_RANGES } from "./constants";
+import {
+  type Language,
+  type PageSize,
+  type RangeValue,
+  TIME_RANGES,
+} from "./constants";
 
 /** 展示层需要的仓库字段（GitHub Search API items 子集） */
 export interface RepoItem {
@@ -34,7 +39,6 @@ const API_URL = "https://api.github.com/search/repositories";
 const REVALIDATE_SECONDS = 1800;
 /** 指数退避重试间隔：500ms / 1s / 2s，最多 3 次重试 */
 const RETRY_DELAYS_MS = [500, 1000, 2000];
-const PER_PAGE = 30;
 
 /** 进程级兜底缓存：请求彻底失败时保留上次成功结果（best-effort） */
 interface FallbackEntry {
@@ -45,7 +49,7 @@ const lastGoodResults = new Map<string, FallbackEntry>();
 
 const sleep = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
 
-function buildUrl(lang: Language, range: RangeValue): string {
+function buildUrl(lang: Language, range: RangeValue, count: PageSize): string {
   const days = TIME_RANGES.find((r) => r.value === range)?.days ?? 30;
   // 日期计算在服务端完成，格式 YYYY-MM-DD
   const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000)
@@ -62,7 +66,7 @@ function buildUrl(lang: Language, range: RangeValue): string {
     q: conditions.join(" "),
     sort: "stars",
     order: "desc",
-    per_page: String(PER_PAGE),
+    per_page: String(count),
   });
   return `${API_URL}?${params.toString()}`;
 }
@@ -107,10 +111,11 @@ async function requestOnce(
 export async function fetchTrendingRepos(
   lang: Language,
   range: RangeValue,
+  count: PageSize,
 ): Promise<TrendingResult> {
-  const url = buildUrl(lang, range);
+  const url = buildUrl(lang, range, count);
   const headers = buildHeaders();
-  const cacheKey = `${lang}/${range}`;
+  const cacheKey = `${lang}/${range}/${count}`;
   let lastError: unknown = null;
 
   for (let attempt = 0; attempt <= RETRY_DELAYS_MS.length; attempt++) {

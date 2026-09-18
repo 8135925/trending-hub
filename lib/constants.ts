@@ -26,6 +26,11 @@ export type RangeValue = (typeof TIME_RANGES)[number]["value"];
 export const DEFAULT_LANGUAGE: Language = "all";
 export const DEFAULT_RANGE: RangeValue = "month";
 
+/** 每页数量档位（GitHub Search API 单次上限 100） */
+export const PAGE_SIZES = [30, 50, 80, 100] as const;
+export type PageSize = (typeof PAGE_SIZES)[number];
+export const DEFAULT_PAGE_SIZE: PageSize = 30;
+
 /**
  * 非法或缺失的 lang 参数一律回退默认值（all），不抛错不空查询
  */
@@ -43,6 +48,15 @@ export function normalizeRange(raw: string | string[] | undefined): RangeValue {
   const value = Array.isArray(raw) ? raw[0] : raw;
   const hit = TIME_RANGES.find((r) => r.value === value);
   return hit ? hit.value : DEFAULT_RANGE;
+}
+
+/** 非法或缺失的 count 参数一律回退默认值（30） */
+export function normalizeCount(raw: string | string[] | undefined): PageSize {
+  const value = Array.isArray(raw) ? raw[0] : raw;
+  const num = Number.parseInt(value ?? "", 10);
+  return (PAGE_SIZES as readonly number[]).includes(num)
+    ? (num as PageSize)
+    : DEFAULT_PAGE_SIZE;
 }
 
 /** GitHub 官方 linguist 色值（内置小映射表，覆盖筛选列表中的语言） */

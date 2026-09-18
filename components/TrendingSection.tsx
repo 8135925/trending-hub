@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import RepoCard from "./RepoCard";
 import { EmptyState, ErrorState } from "./States";
-import { type Language, type RangeValue } from "@/lib/constants";
+import { type Language, type PageSize, type RangeValue } from "@/lib/constants";
 import { fetchTrendingRepos, type RepoItem } from "@/lib/github";
 import { summarizeOne } from "@/lib/summarize";
 
@@ -35,14 +35,16 @@ async function SummarizedCard({ repo }: { repo: RepoItem }) {
 export default async function TrendingSection({
   lang,
   range,
+  count,
 }: {
   lang: Language;
   range: RangeValue;
+  count: PageSize;
 }) {
   let items: RepoItem[] = [];
   let lastUpdated: string | null = null;
   try {
-    const result = await fetchTrendingRepos(lang, range);
+    const result = await fetchTrendingRepos(lang, range, count);
     items = result.items;
     lastUpdated = result.lastUpdated;
   } catch (error) {

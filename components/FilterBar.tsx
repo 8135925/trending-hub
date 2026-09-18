@@ -5,10 +5,8 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
   type Language,
-  type PageSize,
   type RangeValue,
   LANGUAGES,
-  PAGE_SIZES,
   TIME_RANGES,
 } from "@/lib/constants";
 
@@ -25,10 +23,9 @@ const LANG_LABELS: Record<Language, string> = {
   agent: "AI 智能体",
 };
 
-function buildHref(lang: Language, range: RangeValue, count: PageSize): string {
+function buildHref(lang: Language, range: RangeValue): string {
   const params = new URLSearchParams({ range });
   if (lang !== "all") params.set("lang", lang);
-  if (count !== 30) params.set("count", String(count));
   return `/?${params.toString()}`;
 }
 
@@ -40,11 +37,9 @@ function buildHref(lang: Language, range: RangeValue, count: PageSize): string {
 export default function FilterBar({
   lang,
   range,
-  count,
 }: {
   lang: Language;
   range: RangeValue;
-  count: PageSize;
 }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -75,7 +70,7 @@ export default function FilterBar({
         <span className="filter-label">时间范围</span>
         <div className="filter-row">
           {TIME_RANGES.map((r) => {
-            const href = buildHref(lang, r.value, count);
+            const href = buildHref(lang, r.value);
             const isPending = pending === r.value;
             return (
               <Link
@@ -99,7 +94,7 @@ export default function FilterBar({
         <span className="filter-label">语言 / 专题</span>
         <div className="filter-row">
           {LANGUAGES.map((l) => {
-            const href = buildHref(l, range, count);
+            const href = buildHref(l, range);
             const isPending = pending === l;
             return (
               <Link
@@ -113,30 +108,6 @@ export default function FilterBar({
                   <span className="chip-spinner" aria-hidden="true" />
                 ) : (
                   LANG_LABELS[l]
-                )}
-              </Link>
-            );
-          })}
-        </div>
-      </div>
-      <div className="filter-group">
-        <span className="filter-label">数量</span>
-        <div className="filter-row">
-          {PAGE_SIZES.map((c) => {
-            const href = buildHref(lang, range, c);
-            const isPending = pending === String(c);
-            return (
-              <Link
-                key={c}
-                href={href}
-                onClick={handleNavigate(String(c), href)}
-                className={chipClass(count === c, isPending)}
-                aria-current={count === c ? "page" : undefined}
-              >
-                {isPending ? (
-                  <span className="chip-spinner" aria-hidden="true" />
-                ) : (
-                  c
                 )}
               </Link>
             );

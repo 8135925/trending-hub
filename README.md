@@ -5,7 +5,7 @@
 ## 功能
 
 - **热门列表**：基于 GitHub Search API 的"近 N 天新晋高星项目榜"（Top 30，按 star 降序）
-- **筛选**：时间范围（今日 / 本周 / 本月 / 本季 / 今年）× 语言（全部 / Python / JavaScript / TypeScript / Java / Go / Rust / C++ / C）+ AI 智能体专题（`topic:ai-agent`）+ 数量（30 / 50 / 80 / 100），URL 参数驱动（如 `/?lang=agent&range=week&count=50`），可分享
+- **筛选**：时间范围（今日 / 本周 / 本月 / 本季 / 今年）× 语言（全部 / Python / JavaScript / TypeScript / Java / Go / Rust / C++ / C）+ AI 智能体专题（`topic:ai-agent`），URL 参数驱动（如 `/?lang=agent&range=week`），可分享
 - **最后更新时间**：列表上方显示项目数与数据拉取时间（北京时间，取自 GitHub 响应 date 头，缓存命中时为原始拉取时间）
 - **本地收藏**：localStorage 存精简快照，不跨设备、无账号体系
 - **响应式**：桌面双列卡片 / 移动端单列
